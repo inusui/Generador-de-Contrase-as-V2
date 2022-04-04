@@ -5,10 +5,12 @@
 |               Ricardo - Inusui                         |  
 |******************************************************'''
 
+from sys import maxsize
 from tkinter import *
 from tkinter import messagebox
 import random
 import pickle
+from turtle import bgcolor
 
 root = Tk()
 root.title("Generador de Contraseñas")
@@ -48,6 +50,7 @@ def Guardar():
         file = open("passwords.pckl","wb")
         pickle.dump(guardarlista, file)
         file.close()
+        messagebox.showinfo("Contraseña Guardada","Contraseña ["+guardarpwd+"] Guardada")
     else:
         messagebox.showerror("Error","Debe Generar Alguna Contraseña antes")
         mensaje.set("Genere alguna Contraseña")
@@ -57,17 +60,33 @@ def Mostrar():
     passwordlist = pickle.load(file)
     file.close()
     print(passwordlist)
-    messagebox.showinfo("Contraseñas Generadas",passwordlist)
-    return passwordlist
-    
+    if passwordlist != None:
+        newwindows = Toplevel(root)
+        newwindows.title("Contraseñas Generadas")
+        texto = Text(newwindows)
+        texto.insert('insert', passwordlist)
+        texto.configure(state='disable', bg='silver')
+        texto.grid()
+    else:
+        messagebox.showinfo("Fichero Vacio", "No Tiene Contraseñas Guardadas")
 
 def Salir():
     alt = messagebox.askquestion("Salir","¿Seguro de salir?")
     if alt =="yes":
         root.destroy()      
         
+def Borrar():
+    messagebox.showwarning("Borrar todas las Contraseñas", "Esta accion es Irreversible")
+    alt = messagebox.askyesnocancel("Borrar Todas las Contraseñas", "¿Esta completamente seguro que desea borrar todas las contraseñas?")
+    
+    if (alt):
+        file = open("passwords.pckl","wb")
+        pickle.dump(None, file)
+        file.close()
+        messagebox.showinfo("Contraseñas Borradas", "Contraseñas Borradas con exito")
+    elif(alt == False):
+        Mostrar()        
 
-    #Guardar()
 #*************Inicializacion de variables
 newpassword = StringVar()
 newpassword.set("")
@@ -97,7 +116,7 @@ botonGuardar.grid(row=3,column=1,padx=5,pady=5)
 botonMostrar = Button(root,text="Mostrar Contraseñas", command=Mostrar)
 botonMostrar.grid(row=3,column=2,padx=5,pady=5)
 
-botonBorrar = Button(root,text="Borrar Todas\nLas Contraseñas Guardadas")
+botonBorrar = Button(root,text="Borrar Todas\nLas Contraseñas Guardadas", command=Borrar)
 botonBorrar.grid(row=4,column=1,padx=5,pady=5)
 
 botonSalir = Button(root,text="Salir", command=Salir)
